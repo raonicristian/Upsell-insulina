@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oferta Especial</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    background: #f5f5f5;
+    color: #222;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ===== Barra de aviso fixa ===== */
+  .warning-bar {
+    background: #ffb100;
+    color: #1a1a1a;
+    text-align: center;
+    font-weight: 700;
+    padding: 14px 16px;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 28px 16px 60px;
+  }
+
+  /* ===== Aviso "pedido não concluído" ===== */
+  .order-alert {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .order-alert .icon { font-size: 26px; line-height: 1; }
+  .order-alert h2 {
+    font-size: 19px;
+    font-weight: 800;
+    margin-bottom: 2px;
+  }
+  .order-alert p {
+    font-size: 15px;
+    color: #333;
+  }
+
+  /* ===== Player VTurb ===== */
+  .video-wrap {
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.12);
+    margin-bottom: 20px;
+  }
+
+  .instructions {
+    text-align: center;
+    font-size: 16px;
+    line-height: 1.6;
+    color: #333;
+    margin-bottom: 28px;
+  }
+
+  /* ===== Bloco da oferta (fica oculto até liberar) ===== */
+  #oferta {
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transform: translateY(12px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+    pointer-events: none;
+  }
+  #oferta.revelada {
+    opacity: 1;
+    max-height: 2000px;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .price-box {
+    border: 2px dashed #ff7a1a;
+    background: #fff8e6;
+    border-radius: 10px;
+    padding: 24px;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .badge-unica {
+    display: inline-block;
+    background: #e11d1d;
+    color: #fff;
+    font-weight: 800;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    padding: 8px 18px;
+    border-radius: 30px;
+    margin-bottom: 16px;
+  }
+  .price-de {
+    font-size: 18px;
+    color: #888;
+    text-decoration: line-through;
+    margin-bottom: 4px;
+  }
+  .price-por {
+    font-size: 42px;
+    font-weight: 800;
+    color: #17a852;
+  }
+
+  .btn-cta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    background: #22b14c;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 22px 28px;
+    font-size: 20px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 6px 0 #178a3a, 0 10px 24px rgba(34,177,76,0.35);
+    transition: transform 0.15s ease;
+    margin-bottom: 14px;
+    text-decoration: none;
+  }
+  .btn-cta:active { transform: translateY(3px); box-shadow: 0 3px 0 #178a3a; }
+  .btn-cta span.label { text-transform: uppercase; }
+  .btn-cta span.value { font-size: 20px; font-weight: 800; }
+
+  .tempo-limitado {
+    text-align: center;
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 14px;
+  }
+
+  .recusar {
+    display: block;
+    text-align: center;
+    font-size: 14px;
+    color: #666;
+    text-decoration: underline;
+    margin-bottom: 30px;
+  }
+
+  .expira-label {
+    text-align: center;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #444;
+    margin-bottom: 10px;
+  }
+
+  .countdown {
+    max-width: 260px;
+    margin: 0 auto;
+    border: 2px solid #f3b0b0;
+    border-radius: 10px;
+    text-align: center;
+    padding: 16px 0;
+    font-size: 44px;
+    font-weight: 800;
+    color: #e11d1d;
+    letter-spacing: 2px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ===== Pop-up de downsell ===== */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 999;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+  .modal-overlay.aberto {
+    display: flex;
+  }
+  .modal-box {
+    background: #fff;
+    border-radius: 12px;
+    max-width: 420px;
+    width: 100%;
+    padding: 28px 24px;
+    text-align: center;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+    position: relative;
+  }
+  .modal-close {
+    position: absolute;
+    top: 10px;
+    right: 14px;
+    font-size: 22px;
+    color: #999;
+    background: none;
+    border: none;
+    cursor: pointer;
+    line-height: 1;
+  }
+  .modal-box h3 {
+    font-size: 20px;
+    font-weight: 800;
+    color: #1a1a1a;
+    margin-bottom: 14px;
+    line-height: 1.4;
+  }
+  .modal-box .btn-cta {
+    margin-top: 10px;
+    justify-content: center;
+    gap: 10px;
+  }
+</style>
+</head>
+<body>
+
+  <div class="warning-bar">
+    Importante: NÃO feche essa página ou clique no botão voltar.<br>
+    Isso pode gerar problemas com o seu pedido.
+  </div>
+
+  <div class="container">
+
+    <div class="order-alert">
+      <div class="icon">⚠️</div>
+      <div>
+        <h2>Seu pedido ainda não foi concluído!</h2>
+        <p>Veja a mensagem abaixo</p>
+      </div>
+    </div>
+
+    <!-- ============================================= -->
+    <!-- PLAYER VTURB — cole aqui o embed exato da VSL   -->
+    <!-- ============================================= -->
+    <div class="video-wrap">
+      <script type="text/javascript">
+        var s = document.createElement("script");
+        s.src = "https://scripts.converteai.net/lib/js/smartplayer-wc/v4/sdk.js";
+        s.async = !0;
+        document.head.appendChild(s);
+      </script>
+      <div id="ifr_6aa814b80d45faff80faa046_wrapper" style="margin: 0 auto; width: 100%;">
+        <div style="position: relative; padding: 56.25% 0 0 0;" id="ifr_6aa814b80d45faff80faa046_aspect">
+          <iframe
+            frameborder="0"
+            allowfullscreen
+            src="about:blank"
+            id="ifr_6aa814b80d45faff80faa046"
+            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"
+            referrerpolicy="origin"
+            onload="this.onload=null, this.src='https://scripts.converteai.net/24c7ef8b-2565-46e4-86f8-80b31c9446b0/players/6aa814b80d45faff80faa046/v4/embed.html' +(location.search||'?') +'&vl=' +encodeURIComponent(location.href)"
+          ></iframe>
+        </div>
+      </div>
+    </div>
+    <!-- ============================================= -->
+    <!-- FIM DO PLAYER VTURB                             -->
+    <!-- ============================================= -->
+
+    <p class="instructions">
+      Assista a mensagem acima sobre <strong>seu produto</strong>.<br>
+      Seu link de acesso aparecerá abaixo.
+    </p>
+
+    <!-- ============================================= -->
+    <!-- BLOCO DA OFERTA — some até liberar (6 min)      -->
+    <!-- ============================================= -->
+    <div id="oferta">
+
+      <div class="price-box">
+        <span class="badge-unica">⚡ OFERTA ÚNICA — SÓ APARECE AGORA</span>
+        <div class="price-de">De: R$ 197,00</div>
+        <div class="price-por">Por: R$ 67,00</div>
+      </div>
+
+      <a class="btn-cta" id="btnComprar" href="https://pay.cakto.com.br/shzh9jp_1098660">
+        <span class="label">Quero ativar agora</span>
+        <span class="value">R$ 67,00</span>
+      </a>
+
+      <p class="tempo-limitado">Oferta única por tempo limitado</p>
+
+      <a href="#" class="recusar" id="linkRecusar">Não quero fazer parte do clube do segredo agora!</a>
+
+      <p class="expira-label">ESTA OFERTA EXPIRA EM</p>
+      <div class="countdown" id="countdown">10:00</div>
+
+    </div>
+
+  </div>
+
+  <!-- ============================================= -->
+  <!-- POP-UP DE DOWNSELL                              -->
+  <!-- ============================================= -->
+  <div class="modal-overlay" id="modalDownsell">
+    <div class="modal-box">
+      <button class="modal-close" id="modalFechar" aria-label="Fechar">&times;</button>
+      <h3>Não perca o acesso! Compre agora por R$ 27,90 e não fique de fora do clube do segredo!</h3>
+      <a class="btn-cta" id="btnDownsell" href="https://pay.cakto.com.br/vnyw2nc">
+        <span class="label">Quero agora por R$ 27,90</span>
+      </a>
+    </div>
+  </div>
+
+<script>
+  // ============================================================
+  // 1) LIBERAÇÃO DA OFERTA — aparece depois de 6 minutos de página
+  //    (ajuste REVEAL_SECONDS se quiser outro tempo)
+  // ============================================================
+  var REVEAL_SECONDS = 6 * 60; // 360s = 6 minutos
+
+  setTimeout(function () {
+    var oferta = document.getElementById('oferta');
+    oferta.classList.add('revelada');
+    // rola suavemente até a oferta quando ela aparece
+    oferta.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    startCountdown(10 * 60); // inicia o timer de escassez de 10 min assim que a oferta aparece
+  }, REVEAL_SECONDS * 1000);
+
+  // ============================================================
+  // 2) TIMER DE ESCASSEZ dentro da caixa de oferta (ex: 10:00)
+  // ============================================================
+  function startCountdown(totalSeconds) {
+    var el = document.getElementById('countdown');
+    var remaining = totalSeconds;
+
+    function render() {
+      var m = Math.floor(remaining / 60);
+      var s = remaining % 60;
+      el.textContent =
+        (m < 10 ? '0' + m : m) + ':' + (s < 10 ? '0' + s : s);
+    }
+
+    render();
+    var interval = setInterval(function () {
+      remaining--;
+      if (remaining <= 0) {
+        remaining = 0;
+        render();
+        clearInterval(interval);
+        return;
+      }
+      render();
+    }, 1000);
+  }
+
+  // ============================================================
+  // 3) POP-UP DE DOWNSELL — abre ao clicar em "Não quero fazer parte..."
+  // ============================================================
+  var modal = document.getElementById('modalDownsell');
+
+  document.getElementById('linkRecusar').addEventListener('click', function (e) {
+    e.preventDefault();
+    modal.classList.add('aberto');
+  });
+
+  document.getElementById('modalFechar').addEventListener('click', function () {
+    modal.classList.remove('aberto');
+  });
+
+  // fecha o pop-up clicando fora da caixa
+  modal.addEventListener('click', function (e) {
+    if (e.target === modal) {
+      modal.classList.remove('aberto');
+    }
+  });
+</script>
+
+</body>
+</html>
