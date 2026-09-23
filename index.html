@@ -133,20 +133,23 @@
   .btn-cta span.label { text-transform: uppercase; }
   .btn-cta span.value { font-size: 20px; font-weight: 800; }
 
+  #caktoUpsellWrap {
+    margin-bottom: 14px;
+  }
+  #caktoUpsellWrap cakto-upsell-accept::part(button) {
+    width: 100%;
+    font-size: 20px;
+    font-weight: 800;
+    padding: 22px 28px;
+    border-radius: 8px;
+    box-shadow: 0 6px 0 #178a3a, 0 10px 24px rgba(34,177,76,0.35);
+  }
+
   .tempo-limitado {
     text-align: center;
     font-size: 14px;
     color: #666;
     margin-bottom: 14px;
-  }
-
-  .recusar {
-    display: block;
-    text-align: center;
-    font-size: 14px;
-    color: #666;
-    text-decoration: underline;
-    margin-bottom: 30px;
   }
 
   .expira-label {
@@ -172,52 +175,15 @@
     font-variant-numeric: tabular-nums;
   }
 
-  /* ===== Pop-up de downsell ===== */
-  .modal-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.6);
-    z-index: 999;
-    align-items: center;
-    justify-content: center;
-    padding: 16px;
-  }
-  .modal-overlay.aberto {
-    display: flex;
-  }
-  .modal-box {
-    background: #fff;
-    border-radius: 12px;
-    max-width: 420px;
-    width: 100%;
-    padding: 28px 24px;
-    text-align: center;
-    box-shadow: 0 12px 40px rgba(0,0,0,0.3);
-    position: relative;
-  }
-  .modal-close {
-    position: absolute;
-    top: 10px;
-    right: 14px;
-    font-size: 22px;
-    color: #999;
+  #caktoUpsellWrap cakto-upsell-reject::part(button) {
+    display: block;
+    margin: 4px auto 0;
     background: none;
+    color: #666;
+    font-size: 14px;
+    text-decoration: underline;
     border: none;
-    cursor: pointer;
-    line-height: 1;
-  }
-  .modal-box h3 {
-    font-size: 20px;
-    font-weight: 800;
-    color: #1a1a1a;
-    margin-bottom: 14px;
-    line-height: 1.4;
-  }
-  .modal-box .btn-cta {
-    margin-top: 10px;
-    justify-content: center;
-    gap: 10px;
+    box-shadow: none;
   }
 </style>
 </head>
@@ -282,14 +248,35 @@
         <div class="price-por">Por: R$ 67,00</div>
       </div>
 
-      <a class="btn-cta" id="btnComprar" href="https://pay.cakto.com.br/shzh9jp_1098660">
-        <span class="label">Quero ativar agora</span>
-        <span class="value">R$ 67,00</span>
-      </a>
+      <!-- ============================================= -->
+      <!-- BOTÃO DE UPSELL DE UM CLIQUE (CAKTO)             -->
+      <!-- ============================================= -->
+      <div id="caktoUpsellWrap">
+        <cakto-upsell-buttons>
+          <cakto-upsell-accept
+            bg-color="#03b809ff"
+            text-color="#ffffff"
+            upsell-accept-url="https://upsell-insulina-2-chocolate.vercel.app/"
+            offer-id="shzh9jp"
+            app-base-url="https://app.cakto.com.br"
+            offer-type="upsell"
+            upsell-reject-url="https://downsell-insulina-1.vercel.app/"
+          >
+            QUERO ATIVAR AGORA
+          </cakto-upsell-accept>
+          <cakto-upsell-reject
+            upsell-reject-url="https://downsell-insulina-1.vercel.app/"
+          >
+            Não quero emagrecer.
+          </cakto-upsell-reject>
+        </cakto-upsell-buttons>
+        <script type="text/javascript" src="https://caktoscripts.nyc3.cdn.digitaloceanspaces.com/upsell.js"></script>
+      </div>
+      <!-- ============================================= -->
+      <!-- FIM DO BOTÃO CAKTO                               -->
+      <!-- ============================================= -->
 
       <p class="tempo-limitado">Oferta única por tempo limitado</p>
-
-      <a href="#" class="recusar" id="linkRecusar">Não quero fazer parte do clube do segredo agora!</a>
 
       <p class="expira-label">ESTA OFERTA EXPIRA EM</p>
       <div class="countdown" id="countdown">10:00</div>
@@ -298,33 +285,56 @@
 
   </div>
 
-  <!-- ============================================= -->
-  <!-- POP-UP DE DOWNSELL                              -->
-  <!-- ============================================= -->
-  <div class="modal-overlay" id="modalDownsell">
-    <div class="modal-box">
-      <button class="modal-close" id="modalFechar" aria-label="Fechar">&times;</button>
-      <h3>Não perca o acesso! Compre agora por R$ 27,90 e não fique de fora do clube do segredo!</h3>
-      <a class="btn-cta" id="btnDownsell" href="https://pay.cakto.com.br/vnyw2nc">
-        <span class="label">Quero agora por R$ 27,90</span>
-      </a>
-    </div>
-  </div>
-
 <script>
   // ============================================================
-  // 1) LIBERAÇÃO DA OFERTA — aparece depois de 6 minutos de página
+  // 1) LIBERAÇÃO DA OFERTA — aparece 8 minutos depois do PLAY do vídeo
   //    (ajuste REVEAL_SECONDS se quiser outro tempo)
   // ============================================================
-  var REVEAL_SECONDS = 6 * 60; // 360s = 6 minutos
+  var REVEAL_SECONDS = 8 * 60; // 480s = 8 minutos após o play
+  var contadorIniciado = false;
 
-  setTimeout(function () {
+  function revelarOferta() {
     var oferta = document.getElementById('oferta');
+    if (oferta.classList.contains('revelada')) return;
     oferta.classList.add('revelada');
-    // rola suavemente até a oferta quando ela aparece
     oferta.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    startCountdown(10 * 60); // inicia o timer de escassez de 10 min assim que a oferta aparece
-  }, REVEAL_SECONDS * 1000);
+    startCountdown(10 * 60); // timer de escassez de 10 min assim que a oferta aparece
+  }
+
+  function iniciarContagemPos8Min() {
+    if (contadorIniciado) return; // garante que só conta uma vez, a partir do primeiro play
+    contadorIniciado = true;
+    setTimeout(revelarOferta, REVEAL_SECONDS * 1000);
+  }
+
+  // --- Detecta o play real do player VTurb ---
+  // A VTurb roda dentro de um iframe de outro domínio, então o play chega
+  // por postMessage. Cobrimos os formatos mais comuns que o player envia.
+  window.addEventListener('message', function (event) {
+    if (!event.origin || event.origin.indexOf('converteai.net') === -1) return;
+    var data = event.data;
+    var texto = '';
+    try {
+      texto = typeof data === 'string' ? data : JSON.stringify(data);
+    } catch (e) {
+      texto = '';
+    }
+    if (/play/i.test(texto) && !/pause|paused/i.test(texto)) {
+      iniciarContagemPos8Min();
+    }
+  });
+
+  // --- Fallback: clique no vídeo (cobre o caso comum de autoplay mudo,
+  //     onde o "play" de verdade só acontece quando a pessoa clica pra
+  //     ativar o som) ---
+  document.querySelector('.video-wrap').addEventListener('click', function () {
+    iniciarContagemPos8Min();
+  }, { once: true });
+
+  // --- Fallback de segurança: se nenhum sinal de play for detectado em
+  //     20s (ex: bloqueio de terceiros, autoplay silencioso sem clique),
+  //     começa a contar mesmo assim, pra oferta nunca deixar de aparecer ---
+  setTimeout(iniciarContagemPos8Min, 20 * 1000);
 
   // ============================================================
   // 2) TIMER DE ESCASSEZ dentro da caixa de oferta (ex: 10:00)
@@ -353,26 +363,8 @@
     }, 1000);
   }
 
-  // ============================================================
-  // 3) POP-UP DE DOWNSELL — abre ao clicar em "Não quero fazer parte..."
-  // ============================================================
-  var modal = document.getElementById('modalDownsell');
-
-  document.getElementById('linkRecusar').addEventListener('click', function (e) {
-    e.preventDefault();
-    modal.classList.add('aberto');
-  });
-
-  document.getElementById('modalFechar').addEventListener('click', function () {
-    modal.classList.remove('aberto');
-  });
-
-  // fecha o pop-up clicando fora da caixa
-  modal.addEventListener('click', function (e) {
-    if (e.target === modal) {
-      modal.classList.remove('aberto');
-    }
-  });
+  // Recusa e downsell agora são tratados pelo próprio widget da Cakto
+  // (cakto-upsell-reject leva direto para upsell-reject-url).
 </script>
 
 </body>
