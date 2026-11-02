@@ -133,16 +133,8 @@
   .btn-cta span.label { text-transform: uppercase; }
   .btn-cta span.value { font-size: 20px; font-weight: 800; }
 
-  #caktoUpsellWrap {
+  #upsellWrap {
     margin-bottom: 14px;
-  }
-  #caktoUpsellWrap cakto-upsell-accept::part(button) {
-    width: 100%;
-    font-size: 20px;
-    font-weight: 800;
-    padding: 22px 28px;
-    border-radius: 8px;
-    box-shadow: 0 6px 0 #178a3a, 0 10px 24px rgba(34,177,76,0.35);
   }
 
   .tempo-limitado {
@@ -173,17 +165,6 @@
     color: #e11d1d;
     letter-spacing: 2px;
     font-variant-numeric: tabular-nums;
-  }
-
-  #caktoUpsellWrap cakto-upsell-reject::part(button) {
-    display: block;
-    margin: 4px auto 0;
-    background: none;
-    color: #666;
-    font-size: 14px;
-    text-decoration: underline;
-    border: none;
-    box-shadow: none;
   }
 </style>
 </head>
@@ -249,31 +230,41 @@
       </div>
 
       <!-- ============================================= -->
-      <!-- BOTÃO DE UPSELL DE UM CLIQUE (CAKTO)             -->
+      <!-- BOTÃO DE UPSELL DE UM CLIQUE (LASTLINK)          -->
       <!-- ============================================= -->
-      <div id="caktoUpsellWrap">
-        <cakto-upsell-buttons>
-          <cakto-upsell-accept
-            bg-color="#03b809ff"
-            text-color="#ffffff"
-            upsell-accept-url="https://upsell-insulina-2-chocolate.vercel.app/"
-            offer-id="shzh9jp"
-            app-base-url="https://app.cakto.com.br"
-            offer-type="upsell"
-            upsell-reject-url="https://downsell-insulina-1.vercel.app/"
-          >
-            QUERO ATIVAR AGORA
-          </cakto-upsell-accept>
-          <cakto-upsell-reject
-            upsell-reject-url="https://downsell-insulina-1.vercel.app/"
-          >
-            Não quero emagrecer.
-          </cakto-upsell-reject>
-        </cakto-upsell-buttons>
-        <script type="text/javascript" src="https://caktoscripts.nyc3.cdn.digitaloceanspaces.com/upsell.js"></script>
+      <div id="upsellWrap">
+        <script src="https://cdn.lastlink.com/upsell.min.js"></script>
+        <script>
+        var upsellRedirect = "https://lastlink.com/app/member/dashboardV2";
+
+        function setupDenyButtons() {
+            document.querySelectorAll('[id^="denyButton"]').forEach(button => {
+                button.onclick = function() {
+                    const currentUrl = new URL(window.location.href);
+                    const newUrl = new URL("https://lastlink.com/app/member/dashboardV2");
+
+                    currentUrl.searchParams.forEach((value, key) => {
+                        newUrl.searchParams.append(key, value);
+                    });
+
+                    window.location.href = newUrl.toString();
+                };
+            });
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', setupDenyButtons);
+        } else {
+            setupDenyButtons();
+        }
+        </script>
+        <div style="font-family: DM Sans; display: flex; flex-direction: column; gap: 24px; align-items: center; cursor: pointer;">
+          <div class="button-default button-accept w-full" style="padding: 17px 32px; line-height: 22px; border-radius: 12px; font-weight: 700 !important; background-color: rgb(52, 226, 60); color: rgb(0, 0, 0);" id="llupsell-C2E9A5C29-"> QUERO A SECAR EM 7 DIAS </div>
+          <div class="button-default button-deny w-full" style="text-decoration: underline; line-height: 22px; font-size: 16px; font-weight: 700 !important; color: rgb(0, 0, 0);" id="denyButton38cc5ee"> QUERO CONTINUAR GORDA. </div>
+        </div>
       </div>
       <!-- ============================================= -->
-      <!-- FIM DO BOTÃO CAKTO                               -->
+      <!-- FIM DO BOTÃO LASTLINK                            -->
       <!-- ============================================= -->
 
       <p class="tempo-limitado">Oferta única por tempo limitado</p>
