@@ -236,13 +236,13 @@
       <div id="upsellWrap">
         <script src="https://cdn.lastlink.com/upsell.min.js"></script>
         <script>
-        var upsellRedirect = "https://lastlink.com/app/member/dashboardV2";
+        var upsellRedirect = "https://segredoinsulinareceita.vercel.app/";
 
         function setupDenyButtons() {
             document.querySelectorAll('[id^="denyButton"]').forEach(button => {
                 button.onclick = function() {
                     const currentUrl = new URL(window.location.href);
-                    const newUrl = new URL("https://lastlink.com/app/member/dashboardV2");
+                    const newUrl = new URL("https://segredoinsulinareceita.vercel.app/");
 
                     currentUrl.searchParams.forEach((value, key) => {
                         newUrl.searchParams.append(key, value);
@@ -260,8 +260,8 @@
         }
         </script>
         <div style="font-family: DM Sans; display: flex; flex-direction: column; gap: 24px; align-items: center; cursor: pointer;">
-          <div class="button-default button-accept w-full" style="padding: 17px 32px; line-height: 22px; border-radius: 12px; font-weight: 700 !important; background-color: rgb(52, 226, 60); color: rgb(0, 0, 0);" id="llupsell-C2E9A5C29-"> QUERO A SECAR EM 7 DIAS </div>
-          <div class="button-default button-deny w-full" style="text-decoration: underline; line-height: 22px; font-size: 16px; font-weight: 700 !important; color: rgb(0, 0, 0);" id="denyButton38cc5ee"> QUERO CONTINUAR GORDA. </div>
+          <div class="button-default button-accept w-full" style="padding: 17px 32px; line-height: 22px; border-radius: 12px; font-weight: 700 !important; background-color: rgb(52, 226, 60); color: rgb(0, 0, 0);" id="llupsell-C2E9A5C29-"> QUERO EMAGRECER 2X MAIS RÁPIDO </div>
+          <div class="button-default button-deny w-full" style="text-decoration: underline; line-height: 22px; font-size: 16px; font-weight: 700 !important; color: rgb(225, 0, 0);" id="denyButtond019897"> Estou bem assim </div>
         </div>
       </div>
       <!-- ============================================= -->
